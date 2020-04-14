@@ -36,8 +36,8 @@
     <div id="message">
       <h1>AnimalCrossing Turnip Price Logger</h1>
 
-      <h2>Welcome: <span id="userDisplayName"></span></h2> 
-
+      <h2>Welcome: <span id="userDisplayName"></span></h2>
+      
       <button type="button" class="btn btn-outline-danger btn-sm" style="display: inline;" id="logoutButton" onclick="logout()">Logout</button>
 
       <div style="margin:auto; margin-top: 16px; width:100%;">
@@ -55,7 +55,7 @@
         <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample2">
           HowToUse
         </button>
-        <a style="box-shadow: none;" type="button" class="btn btn-outline-primary btn-sm" target="_blank" href="https://turnipprophet.io/index.html">Projection</a>
+        
       </div>
 
       <p></p>
@@ -95,14 +95,19 @@
         </div>
       </div>
 
+      <div class="collapse" id="collapseExample2">
+        <div class="card card-body">
+          <p>This website helps you record price history of turnips on your island. More features will be rolling out soon.</p>
+          <p>Here is a useful website to calculate price projections based on your history price. <a style="box-shadow: none;" type="button" class="btn btn-outline-secondary btn-sm" target="_blank" href="https://turnipprophet.io/index.html">Projection</a></p>
+        </div>
+      </div>
+
       <div id="priceHistoryBox"></div>
         <ul style="list-style-type:none;" class="list-group" id="priceHistoryList">
         </ul>
       </div>
 
-      <div class="collapse" id="collapseExample">
-        This website helps you record price history of turnips on your island. More features will be rolling out soon.
-      </div>
+      
     </div>
 
     <hr style="width: 80%;">
