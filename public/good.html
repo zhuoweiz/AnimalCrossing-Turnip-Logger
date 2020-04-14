@@ -52,6 +52,9 @@
         <button class="btn btn-primary btn-sm" type="button" onclick="fetchData()">
           History
         </button>
+        <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample2">
+          HowToUse
+        </button>
         <a style="box-shadow: none;" type="button" class="btn btn-outline-primary btn-sm" target="_blank" href="https://turnipprophet.io/index.html">Projection</a>
       </div>
 
@@ -96,11 +99,14 @@
         <ul style="list-style-type:none;" class="list-group" id="priceHistoryList">
         </ul>
       </div>
-    
+
+      <div class="collapse" id="collapseExample">
+        This website helps you record price history of turnips on your island. More features will be rolling out soon.
+      </div>
     </div>
 
     <hr style="width: 80%;">
-    <p id="load">Developed by zhuoweiz - Supported by Firebase</p>
+    <p id="load">Developed by <a style="text-decoration: none;" href="zhuoweiz@usc.edu">zhuoweiz</a> - Supported by Firebase</p>
 
     <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
 
@@ -177,7 +183,7 @@
         var selectedDate = new Date(dateString);
         console.log('selected day: ' + selectedDate.getDay());
         if(selectedDate.getDay() == 6) {
-          time = 0;
+          time = 2;
           $("#buySellTag").html("Buy");
           $("#buySellTag").toggleClass("badge-danger");
           $("#buySellTag").toggleClass("badge-success");
@@ -241,10 +247,15 @@
 
           priceHistoryHolder.forEach(function(data) {
             var tempDateStamp = data.priceTimeStamp;
-            let tempTime = (tempDateStamp[tempDateStamp.length-1]=='1' ? "PM" : "AM");
+            let tempTimeIndicator = tempDateStamp[tempDateStamp.length-1];
+            let tempTime = (tempTimeIndicator=='1' ? "PM" : "AM");
+            if(tempTimeIndicator != '2') {
+              $(priceHistoryList).append('<li class="list-group-item d-flex justify-content-between align-items-center">' + tempDateStamp.substring(0,10) + ' ' + tempTime + '<span class="badge badge-primary badge-pill">$ ' + data.price + '</span>' + '</li>');
+            } else {
+              $(priceHistoryList).append('<li class="list-group-item d-flex justify-content-between align-items-center">' + tempDateStamp.substring(0,10) + ' ' + tempTime + '<span class="badge badge-danger badge-pill">$ ' + data.price + '</span>' + '</li>');
+            }
 
             // tempDateStamp = (tempTime=="PM" ? "          " : tempDateStamp);
-            $(priceHistoryList).append('<li class="list-group-item d-flex justify-content-between align-items-center">' + tempDateStamp.substring(0,10) + ' ' + tempTime + '<span class="badge badge-primary badge-pill">$ ' + data.price + '</span>' + '</li>');
           })
         });
       }
