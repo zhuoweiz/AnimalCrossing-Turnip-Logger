@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AC Turnip Price Logger</title>
+
+    <!-- Bootstrap support -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    
+
+    <style media="screen">
+      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
+      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
+      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+      @media (max-width: 600px) {
+        body, #message { margin-top: 0; background: white; box-shadow: none; }
+        body { border-top: 16px solid #ffa100; }
+      }
+    </style>
+  </head>
+  <body>
+    
+    <div id="message">
+      <h2>Welcome</h2>
+      <h1>AnimalCrossing Turnip Price Logger</h1>
+      
+      <button type="button" class="btn btn-primary" onclick="loginAction()">Signup/Login</button>
+      <br>
+      
+      <div id="firebaseui-auth-container">
+        <div id="loader" style="display:none;">Loading...</div>
+      </div>
+
+      <div style="margin:auto; margin-top: 16px; width:100%;">
+        <img style="align-self: center; width:100%; border-radius: 10px;" src="./resource/indexImg.jpg" alt="Stonks">
+      </div>
+      
+    </div>
+
+    <hr style="width: 60%;">
+    <p id="load">Developed by zhuoweiz - Supported by Firebase</p>
+
+    <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
+
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="/__/firebase/7.14.0/firebase-app.js"></script>
+
+    <!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
+    <script src="/__/firebase/7.14.0/firebase-analytics.js"></script>
+
+    <!-- Add Firebase products that you want to use -->
+    <script src="/__/firebase/7.14.0/firebase-auth.js"></script>
+    <script src="/__/firebase/7.14.0/firebase-firestore.js"></script>
+
+    <script src="/__/firebase/init.js"></script>
+    
+    <!-- firebase auth ui -->
+    <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
+
+    
+    <script>
+      firebase.auth().onAuthStateChanged(function(user) {
+        var displayName = "NewGuy"
+        if (user) {
+          var url= "/good.html"; 
+          window.location = url; 
+        } else {
+          // User is signed out.
+          // ...
+        }
+      });
+
+      var ui = new firebaseui.auth.AuthUI(firebase.auth());
+      var uiConfig = {
+        callbacks: {
+          signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+            // User successfully signed in.
+            // Return type determines whether we continue the redirect automatically
+            // or whether we leave that to developer to handle.
+
+            return true;
+          },
+          uiShown: function() {
+            // The widget is rendered.
+            // Hide the loader.
+            document.getElementById('loader').style.display = 'none';
+          }
+        },
+        // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
+        signInFlow: 'popup',
+        signInSuccessUrl: 'good.html',
+        signInOptions: [
+          // Leave the lines as is for the providers you want to offer your users.
+          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+          {
+            provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+            requireDisplayName: true,
+          },
+        ],
+        // Terms of service url.
+        // tosUrl: '#', 
+        // Privacy policy url.
+        // privacyPolicyUrl: '#'
+      };
+
+      function loginAction() {
+        document.getElementById('loader').style.display = 'block';
+        ui.start('#firebaseui-auth-container', uiConfig);
+      }
+    </script>
+  </body>
+</html>

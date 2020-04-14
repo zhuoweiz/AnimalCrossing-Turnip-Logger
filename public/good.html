@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to Firebase Hosting</title>
+
+    <!-- Bootstrap support -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    
+
+    <style media="screen">
+      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; /* Hide scrollbar for IE and Edge */ -ms-overflow-style: none;}
+      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
+      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+      @media (max-width: 600px) {
+        body, #message { margin-top: 0; background: white; box-shadow: none; }
+        body { border-top: 16px solid #ffa100; }
+      }
+
+      /* Hide scrollbar for Chrome, Safari and Opera */
+      body::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <div id="message">
+      <h1>AnimalCrossing Turnip Price Logger</h1>
+
+      <h2>Welcome: <span id="userDisplayName"></span></h2> 
+
+      <button type="button" class="btn btn-outline-danger btn-sm" style="display: inline;" id="logoutButton" onclick="logout()">Logout</button>
+
+      <div style="margin:auto; margin-top: 16px; width:100%;">
+        <img style="align-self: center; width:100%; border-radius: 10px;" src="./resource/indexImg.jpg" alt="Stonks">
+      </div>
+      <br>
+      
+      <div>
+        <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+          Add/Replace Data
+        </button>
+        <button class="btn btn-primary btn-sm" type="button" onclick="fetchData()">
+          Get History
+        </button>
+        <a style="box-shadow: none;" type="button" class="btn btn-outline-primary btn-sm" target="_blank" href="https://turnipprophet.io/index.html">Projection</a>
+      </div>
+
+      <p></p>
+
+      <!-- --------------------- -->
+      <!-- ---- Input Group ---- -->
+      <!-- --------------------- -->
+
+      <div class="collapse" id="collapseExample">
+        <div class="card card-body">
+          <label>1. Date</label>
+          <div class="input-group mb-3">
+          <input onchange="onChangeDate()" type="date" id="datePicker" value="2020-04-01" min="2020-03-23" max="2030-04-01">
+          </div>
+
+          <label>2. Time</label>
+          <div class="input-group mb-3">
+            <div class="form-check form-check-inline">
+              <input onchange="onSwitchTime0()" class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" checked value="0">
+              <label class="form-check-label" for="inlineRadio1">AM</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input onchange="onSwitchTime1()" class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="1">
+              <label class="form-check-label" for="inlineRadio2">PM</label>
+            </div>
+          </div>
+          
+          <label for="price">3. Listed Price</label>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">$</span>
+            </div>
+            <input onchange="onChangePrice()" type="number" id="price" name="price" min="1" max="800" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
+          </div>
+
+          <button type="button" class="btn btn-outline-primary btn-sm" onclick="submitForm()">Submit</button>
+        </div>
+      </div>
+
+      <div id="priceHistoryBox"></div>
+        <ul style="list-style-type:none;" class="list-group" id="priceHistoryList">
+        </ul>
+      </div>
+    
+    </div>
+
+    <hr style="width: 80%;">
+    <p id="load">Developed by zhuoweiz - Supported by Firebase</p>
+
+    <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
+
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="/__/firebase/7.14.0/firebase-app.js"></script>
+
+    <!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
+    <script src="/__/firebase/7.14.0/firebase-analytics.js"></script>
+
+    <!-- Add Firebase products that you want to use -->
+    <script src="/__/firebase/7.14.0/firebase-auth.js"></script>
+    <script src="/__/firebase/7.14.0/firebase-firestore.js"></script>
+
+    <script src="/__/firebase/init.js"></script>
+    
+    <!-- firebase auth ui -->
+    <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
+    
+    <script>
+      var db = firebase.firestore();
+      var email = null;
+      var uid = null;
+
+      firebase.auth().onAuthStateChanged(function(user) {
+        var displayName = "NewGuy";
+        if (user) {
+          // User is signed in.
+          displayName = user.displayName;
+          email = user.email;
+          uid = user.uid;
+          // ...
+
+          document.getElementById('userDisplayName').innerHTML = displayName;
+          document.getElementById('logoutButton').style.display = "block";
+
+          // Initialize Cloud Firestore through Firebase
+          // firebase.initializeApp({
+          //   apiKey: 'AIzaSyB-bU6bn3rkTM3U4OynMbjHcwekm4EHo3A',
+          //   authDomain: '### FIREBASE AUTH DOMAIN ###',
+          //   projectId: 'animalc-bz'
+          // });
+        } else {
+          // User is signed out.
+          // ...
+          email = null;
+          document.getElementById('logoutButton').style.display = none;
+          var url= "/index.html"; 
+          window.location = url; 
+        }
+      });
+
+      var dt = new Date();
+      var month = "0" + (dt.getMonth()+1);
+      var date = "0" + dt.getDate();
+      var dateString = dt.getFullYear() + "-" + month.substring(month.length - 2, month.length) + "-" + date.substring(date.length - 2, date.length);
+      document.getElementById("datePicker").value = dateString;
+      var time = 0;
+      var price = 1;
+
+      function logout() {
+        firebase.auth().signOut().then(function() {
+          // Sign-out successful.
+          alert("Sign Out Successful!");
+          var url= "/index.html"; 
+          window.location = url; 
+        }).catch(function(error) {
+          alert("Sign Out Error")
+        });
+      }
+
+      function onChangeDate() {
+        dateString = $("#datePicker").val();
+      }
+      function onSwitchTime0() {
+        time = 0;
+      }
+      function onSwitchTime1() {
+        time = 1;
+      }
+      function onChangePrice() {
+        price = $("#price").val();
+      }
+
+      function submitForm() {
+        //validate later
+        //call firebase functions
+        if(email) {
+          priceTimeStamp = dateString + "-" + time;
+          db.collection("users").doc(uid).collection("priceLogs").doc(priceTimeStamp).set({
+            priceTimeStamp: priceTimeStamp,
+            price: price
+          })
+          .then(function() {
+            console.log("Document successfully written!");
+            // add new data to the table
+          })
+          .catch(function(error) {
+            console.error("Error writing document: ", error);
+          });
+        } else {
+        }
+      }
+
+      function fetchData() {
+        $("ul").empty();
+        let collectionRef = db.collection("users").doc(uid).collection("priceLogs");
+        collectionRef.get().then(function(querySnapshot) {
+          var priceHistoryHolder = [];
+          querySnapshot.forEach(function(doc) {
+            // doc.data() is never undefined for query doc snapshots
+            console.log(doc.id, " => ", doc.data());
+            priceHistoryHolder.push(doc.data());
+          });
+
+          priceHistoryHolder.sort((a, b) => {
+            return (a.priceTimeStamp > b.priceTimeStamp);
+          });
+
+          priceHistoryHolder.forEach(function(data) {
+            var tempDateStamp = data.priceTimeStamp;
+            let tempTime = (tempDateStamp[tempDateStamp.length-1]=='0' ? "AM" : "PM");
+            // tempDateStamp = (tempTime=="PM" ? "          " : tempDateStamp);
+            $(priceHistoryList).append('<li class="list-group-item d-flex justify-content-between align-items-center">' + tempDateStamp.substring(0,10) + ' ' + tempTime + '<span class="badge badge-primary badge-pill">$ ' + data.price + '</span>' + '</li>');
+          })
+        });
+      }
+
+    </script>
+  </body>
+</html>
