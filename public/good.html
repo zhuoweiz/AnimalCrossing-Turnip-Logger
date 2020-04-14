@@ -50,7 +50,7 @@
           Add/Replace Data
         </button>
         <button class="btn btn-primary btn-sm" type="button" onclick="fetchData()">
-          Get History
+          History
         </button>
         <a style="box-shadow: none;" type="button" class="btn btn-outline-primary btn-sm" target="_blank" href="https://turnipprophet.io/index.html">Projection</a>
       </div>
@@ -63,24 +63,24 @@
 
       <div class="collapse" id="collapseExample">
         <div class="card card-body">
-          <label>1. Date</label>
+          <label>1. Date <span class="badge badge-success" id="buySellTag">Sell</span></label>
           <div class="input-group mb-3">
-          <input onchange="onChangeDate()" type="date" id="datePicker" value="2020-04-01" min="2020-03-23" max="2030-04-01">
+          <input onchange="onChangeDate()" type="date" id="DatePicker" value="2020-04-01" min="2020-03-23" max="2030-04-01">
           </div>
 
           <label>2. Time</label>
           <div class="input-group mb-3">
             <div class="form-check form-check-inline">
-              <input onchange="onSwitchTime0()" class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" checked value="0">
+              <input onchange="onSwitchTime0()" id="RadioButton1" class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" checked value="0">
               <label class="form-check-label" for="inlineRadio1">AM</label>
             </div>
             <div class="form-check form-check-inline">
-              <input onchange="onSwitchTime1()" class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="1">
+              <input onchange="onSwitchTime1()" id="RadioButton2" class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="1">
               <label class="form-check-label" for="inlineRadio2">PM</label>
             </div>
           </div>
           
-          <label for="price">3. Listed Price</label>
+          <label for="price">3. Listed Price </label>
           <div class="input-group mb-3">
             <div class="input-group-prepend">
               <span class="input-group-text">$</span>
@@ -157,7 +157,7 @@
       var month = "0" + (dt.getMonth()+1);
       var date = "0" + dt.getDate();
       var dateString = dt.getFullYear() + "-" + month.substring(month.length - 2, month.length) + "-" + date.substring(date.length - 2, date.length);
-      document.getElementById("datePicker").value = dateString;
+      document.getElementById("DatePicker").value = dateString;
       var time = 0;
       var price = 1;
 
@@ -173,7 +173,26 @@
       }
 
       function onChangeDate() {
-        dateString = $("#datePicker").val();
+        dateString = $("#DatePicker").val();
+        var selectedDate = new Date(dateString);
+        console.log('selected day: ' + selectedDate.getDay());
+        if(selectedDate.getDay() == 6) {
+          time = 0;
+          $("#buySellTag").html("Buy");
+          $("#buySellTag").toggleClass("badge-danger");
+          $("#buySellTag").toggleClass("badge-success");
+          
+          $("#RadioButton1").attr("disabled", "disabled");
+          $("#RadioButton2").attr("disabled", "disabled");
+        } else {
+          time = 0;
+          $("#buySellTag").html("Sell");
+          $("#buySellTag").toggleClass("badge-success");
+          $("#buySellTag").toggleClass("badge-danger");
+          
+          $("#RadioButton1").removeAttr("disabled");
+          $("#RadioButton2").removeAttr("disabled");
+        }
       }
       function onSwitchTime0() {
         time = 0;
@@ -217,12 +236,13 @@
           });
 
           priceHistoryHolder.sort((a, b) => {
-            return (a.priceTimeStamp > b.priceTimeStamp);
+            return (a.priceTimeStamp < b.priceTimeStamp);
           });
 
           priceHistoryHolder.forEach(function(data) {
             var tempDateStamp = data.priceTimeStamp;
-            let tempTime = (tempDateStamp[tempDateStamp.length-1]=='0' ? "AM" : "PM");
+            let tempTime = (tempDateStamp[tempDateStamp.length-1]=='1' ? "PM" : "AM");
+
             // tempDateStamp = (tempTime=="PM" ? "          " : tempDateStamp);
             $(priceHistoryList).append('<li class="list-group-item d-flex justify-content-between align-items-center">' + tempDateStamp.substring(0,10) + ' ' + tempTime + '<span class="badge badge-primary badge-pill">$ ' + data.price + '</span>' + '</li>');
           })
