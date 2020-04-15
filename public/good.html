@@ -6,7 +6,11 @@
     <title>AC Turnip Price Logger</title>
 
     <!-- Bootstrap support -->
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
@@ -47,10 +51,10 @@
       
       <div>
         <button class="btn btn-outline-primary btn-sm" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample" onclick="toggle1()">
-          Add/Replace Data
+          Add / Replace Data
         </button>
         <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#priceHistoryBox" aria-expanded="false" aria-controls="priceHistoryBox" onclick="toggle2()">
-          History
+          Data
         </button>
         <button class="btn btn-info btn-sm" type="button" data-toggle="collapse" data-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample2" onclick="toggle3()">
           HowToUse
@@ -98,14 +102,17 @@
 
       <div class="collapse" id="priceHistoryBox">
         <button class="btn btn-success btn-sm" onclick="fetchData()">Refresh</button>
+        <button class="btn btn-success btn-sm" onclick="flip()">Flip</button>
+        <button class="btn btn-success btn-sm" onclick="forecast()">Forecast</button> 
+        <span class="badge badge-pill badge-info" data-toggle="tooltip" data-placement="bottom" title="Forecast will direct you to TurnipProphet with ur latest week data autofilled.">i</span>
         <ul style="list-style-type:none; margin-top: 10px;" class="list-group" id="priceHistoryList">
         </ul>
       </div>
 
       <div class="collapse" id="collapseExample2">
         <div class="card card-body">
-          <p>This website helps you record price history of turnips on your island. More features will be rolling out soon.</p>
-          <p>Here is a useful website to calculate price projections based on your history price. <a style="box-shadow: none;" type="button" class="btn btn-outline-secondary btn-sm" target="_blank" href="https://turnipprophet.io/index.html">Projection</a></p>
+          <p>This website helps you record price history of turnips on your island. More features will be rolling out.</p>
+          <p>If you click "Forecast" in the "Data" tab, it will direct you to TurnipProphet with you data autofilled, TurnipProphet is great app that helps give projections on possible turnip price trend on your island.
         </div>
         <br>
       </div>
@@ -163,12 +170,16 @@
         }
       });
 
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
+
       var dt = new Date();
       var month = "0" + (dt.getMonth()+1);
       var date = "0" + dt.getDate();
       var dateString = dt.getFullYear() + "-" + month.substring(month.length - 2, month.length) + "-" + date.substring(date.length - 2, date.length);
       document.getElementById("DatePicker").value = dateString;
-      var time = 0;
+      var time = (dt.getHours()<12) ? 0 : 1;
       var price = 1;
 
       function logout() {
@@ -241,13 +252,27 @@
       }
 
       function timeStringParser(str) {
-        console.log(str.split('-').join(''));
         return str.split('-').join('');
       }
 
       function toggle1() {
         $("#priceHistoryBox").collapse('hide');
         $("#collapseExample2").collapse('hide');
+
+        dt = new Date();
+        month = "0" + (dt.getMonth()+1);
+        date = "0" + dt.getDate();
+        dateString = dt.getFullYear() + "-" + month.substring(month.length - 2, month.length) + "-" + date.substring(date.length - 2, date.length);
+        document.getElementById("DatePicker").value = dateString;
+        time = (dt.getHours()<12) ? 0 : 1;
+        console.log('current time hour: '+time);
+        if(time==1) {
+          $("#inlineRadio1").removeAttr("checked");
+          $("#inlineRadio2").attr("checked","checked");
+        } else {
+          $("#inlineRadio2").removeAttr("checked");
+          $("#inlineRadio1").attr("checked","checked");
+        }
       }
       function toggle2() {
         $("#collapseExample").collapse('hide');
@@ -258,16 +283,17 @@
         $("#priceHistoryBox").collapse('hide');
       }
 
-      function fetchData() {
+      var priceHistoryHolder = [];
+      function fetchData(callback) {
         if(!uid) {
           alert("Need to login.");
           window.location = "/index.html"; 
         }
         $("ul").empty();
+        priceHistoryHolder = [];
         
         let collectionRef = db.collection("users").doc(uid).collection("priceLogs");
         collectionRef.get().then(function(querySnapshot) {
-          var priceHistoryHolder = [];
           querySnapshot.forEach(function(doc) {
             // doc.data() is never undefined for query doc snapshots
             console.log(doc.id, " => ", doc.data());
@@ -287,10 +313,78 @@
             } else {
               $(priceHistoryList).append('<li class="list-group-item d-flex justify-content-between align-items-center">' + tempDateStamp.substring(0,10) + ' ' + tempTime + '<span class="badge badge-danger badge-pill">$ ' + data.price + '</span>' + '</li>');
             }
-
-            // tempDateStamp = (tempTime=="PM" ? "          " : tempDateStamp);
           })
+        }).then(() => {
+          if (typeof callback == "function") {
+            callback();
+          }
         });
+      }
+
+      function flip() {
+        var tempPriceHistoryHolder = priceHistoryHolder;
+        tempPriceHistoryHolder.reverse();
+
+        $("ul").fadeOut(300, () => {
+          $("ul").empty();
+          tempPriceHistoryHolder.forEach((data) => {
+            var tempDateStamp = data.priceTimeStamp;
+            let tempTimeIndicator = tempDateStamp[tempDateStamp.length-1];
+            let tempTime = (tempTimeIndicator=='1' ? "PM" : "AM");
+            if(tempTimeIndicator != '2') {
+              $(priceHistoryList).append('<li class="list-group-item d-flex justify-content-between align-items-center">' + tempDateStamp.substring(0,10) + ' ' + tempTime + '<span class="badge badge-primary badge-pill">$ ' + data.price + '</span>' + '</li>');
+            } else {
+              $(priceHistoryList).append('<li class="list-group-item d-flex justify-content-between align-items-center">' + tempDateStamp.substring(0,10) + ' ' + tempTime + '<span class="badge badge-danger badge-pill">$ ' + data.price + '</span>' + '</li>');
+            }
+          })
+          $("#priceHistoryBox").collapse('show');
+
+          $("ul").fadeIn();
+        });
+
+        // $("#priceHistoryBox").collapse('hide');
+        
+        // $("#priceHistoryBox").on('hidden.bs.collapse', () => {
+        //   $("ul").empty();
+        //   tempPriceHistoryHolder.forEach((data) => {
+        //     var tempDateStamp = data.priceTimeStamp;
+        //     let tempTimeIndicator = tempDateStamp[tempDateStamp.length-1];
+        //     let tempTime = (tempTimeIndicator=='1' ? "PM" : "AM");
+        //     if(tempTimeIndicator != '2') {
+        //       $(priceHistoryList).append('<li class="list-group-item d-flex justify-content-between align-items-center">' + tempDateStamp.substring(0,10) + ' ' + tempTime + '<span class="badge badge-primary badge-pill">$ ' + data.price + '</span>' + '</li>');
+        //     } else {
+        //       $(priceHistoryList).append('<li class="list-group-item d-flex justify-content-between align-items-center">' + tempDateStamp.substring(0,10) + ' ' + tempTime + '<span class="badge badge-danger badge-pill">$ ' + data.price + '</span>' + '</li>');
+        //     }
+        //   })
+        //   $("#priceHistoryBox").collapse('show');
+        // });
+        
+      }
+
+      function forecastCore() {
+        var forecastUrl = "https://turnipprophet.io/?prices=";
+        var forecastData = [];
+        
+        for(var i=0; i<priceHistoryHolder.length; i++) {
+          forecastData.push(priceHistoryHolder[i].price);
+          if(i==12 || priceHistoryHolder[i].priceTimeStamp.slice(-1)=="2") {
+            break;
+          }
+        }
+
+        forecastData.reverse();
+        let forecastDataStr = forecastData.join('.');
+
+        window.open(forecastUrl+forecastDataStr, '_blank');
+      }
+
+      function forecast() {
+        if(priceHistoryHolder.length == 0) {
+          console.log("holder size is 0");
+          fetchData(forecastCore);
+        } else {
+          forecastCore();
+        }
       }
 
     </script>
