@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+    <title>AC Turnip Price Logger</title>
 
     <!-- Bootstrap support -->
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
@@ -98,8 +98,7 @@
 
       <div class="collapse" id="priceHistoryBox">
         <button class="btn btn-success btn-sm" onclick="fetchData()">Refresh</button>
-        <br>
-        <ul style="list-style-type:none;" class="list-group" id="priceHistoryList">
+        <ul style="list-style-type:none; margin-top: 10px;" class="list-group" id="priceHistoryList">
         </ul>
       </div>
 
@@ -113,7 +112,7 @@
     </div>
 
     <hr style="width: 80%;">
-    <p id="load">Developed by <a style="text-decoration: none;" href="mailto:zhuoweiz@usc.edu">StormLander</a> - Supported by Firebase</p>
+    <p id="load">Developed by <a style="text-decoration: none;" href="https://github.com/zhuoweiz/AnimalCrossing-Turnip-Logger">StormLander</a> - Supported by Firebase</p>
 
     <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
 
@@ -189,16 +188,16 @@
         if(selectedDate.getDay() == 6) {
           time = 2;
           $("#buySellTag").html("Buy");
-          $("#buySellTag").toggleClass("badge-danger");
-          $("#buySellTag").toggleClass("badge-success");
+          $("#buySellTag").removeClass("badge-success");
+          $("#buySellTag").addClass("badge-danger");
           
           $("#RadioButton1").attr("disabled", "disabled");
           $("#RadioButton2").attr("disabled", "disabled");
         } else {
           time = 0;
           $("#buySellTag").html("Sell");
-          $("#buySellTag").toggleClass("badge-success");
-          $("#buySellTag").toggleClass("badge-danger");
+          $("#buySellTag").removeClass("badge-danger");
+          $("#buySellTag").addClass("badge-success");
           
           $("#RadioButton1").removeAttr("disabled");
           $("#RadioButton2").removeAttr("disabled");
