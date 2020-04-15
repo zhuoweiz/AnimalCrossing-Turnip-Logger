@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AC Turnip Price Logger</title>
+    <title>TurnipMaster</title>
 
     <!-- Bootstrap support -->
     <script
@@ -22,7 +22,6 @@
       #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
       #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
       #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
       #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
       @media (max-width: 600px) {
         body, #message { margin-top: 0; background: white; box-shadow: none; }
@@ -38,6 +37,7 @@
   <body>
     
     <div id="message">
+      <div id="AlertBox" style="z-index: 999; position:fixed; top: 20;"></div>
       <h1>AnimalCrossing Turnip Price Logger</h1>
 
       <h2>Welcome: <span id="userDisplayName"></span></h2>
@@ -70,6 +70,7 @@
 
       <div class="collapse" id="collapseExample">
         <div class="card card-body">
+
           <label>1. Date <span class="badge badge-success" id="buySellTag">Sell</span></label>
           <div class="input-group mb-3">
           <input onchange="onChangeDate()" type="date" id="DatePicker" value="2020-04-01" min="2020-03-23" max="2030-04-01">
@@ -78,12 +79,12 @@
           <label>2. Time</label>
           <div class="input-group mb-3">
             <div class="form-check form-check-inline">
-              <input onchange="onSwitchTime0()" id="RadioButton1" class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" checked value="0">
-              <label class="form-check-label" for="inlineRadio1">AM</label>
+              <input onchange="onSwitchTime0()" id="RadioButton1" class="form-check-input" type="radio" name="inlineRadioOptions" value="0">
+              <label class="form-check-label" for="RadioButton1">AM</label>
             </div>
             <div class="form-check form-check-inline">
-              <input onchange="onSwitchTime1()" id="RadioButton2" class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="1">
-              <label class="form-check-label" for="inlineRadio2">PM</label>
+              <input onchange="onSwitchTime1()" id="RadioButton2" class="form-check-input" type="radio" name="inlineRadioOptions" value="1">
+              <label class="form-check-label" for="RadioButton2">PM</label>
             </div>
           </div>
           
@@ -112,15 +113,14 @@
       <div class="collapse" id="collapseExample2">
         <div class="card card-body">
           <p>This website helps you record price history of turnips on your island. More features will be rolling out.</p>
-          <p>If you click "Forecast" in the "Data" tab, it will direct you to TurnipProphet with you data autofilled, TurnipProphet is great app that helps give projections on possible turnip price trend on your island.
+          <p>If you click "Forecast" in the "Data" tab, it will direct you to <a target="_blank" href="https://turnipprophet.io/">TurnipProphet</a> with you data autofilled, TurnipProphet is great app that helps give projections on possible turnip price trend on your island. </p>
+          <p>Big Thanks to <a style="text-decoration: none;" target="_blank" href="https://github.com/mikebryant/ac-nh-turnip-prices">Project</a> TurnipProphet : )</p>
         </div>
-        <br>
       </div>
     </div>
 
     <hr style="width: 80%;">
     <p id="load">Developed by <a style="text-decoration: none;" href="https://github.com/zhuoweiz/AnimalCrossing-Turnip-Logger">StormLander</a> - Supported by Firebase</p>
-
     <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
 
     <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
@@ -151,17 +151,10 @@
           displayName = user.displayName;
           email = user.email;
           uid = user.uid;
-          // ...
 
           document.getElementById('userDisplayName').innerHTML = displayName;
           document.getElementById('logoutButton').style.display = "block";
 
-          // Initialize Cloud Firestore through Firebase
-          // firebase.initializeApp({
-          //   apiKey: 'AIzaSyB-bU6bn3rkTM3U4OynMbjHcwekm4EHo3A',
-          //   authDomain: '### FIREBASE AUTH DOMAIN ###',
-          //   projectId: 'animalc-bz'
-          // });
         } else {
           // User is signed out.
           // ...
@@ -224,6 +217,19 @@
         price = $("#price").val();
       }
 
+      var bootstrap_alert = function() {};
+      bootstrap_alert.alert = (message) => {
+        let html = '<div class="alert alert-success alert-dismissible fade show" role="alert">' 
+          + "<strong>Success! </strong>"
+          + message
+          + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+        $(html).hide().appendTo("#AlertBox").fadeIn(1000);
+
+        setTimeout(function() {
+          $('.alert').alert('close');
+        }, 1400);
+      }
+
       function submitForm() {
         //call firebase functions
         if(price==1) {
@@ -239,8 +245,7 @@
           })
           .then(function() {
             console.log("Document successfully written!");
-            alert("Success!")
-            // add new data to the table
+            bootstrap_alert.alert("new data added!");
           })
           .catch(function(error) {
             console.error("Error writing document: ", error);
@@ -259,20 +264,19 @@
         $("#priceHistoryBox").collapse('hide');
         $("#collapseExample2").collapse('hide');
 
-        dt = new Date();
-        month = "0" + (dt.getMonth()+1);
-        date = "0" + dt.getDate();
-        dateString = dt.getFullYear() + "-" + month.substring(month.length - 2, month.length) + "-" + date.substring(date.length - 2, date.length);
-        document.getElementById("DatePicker").value = dateString;
-        time = (dt.getHours()<12) ? 0 : 1;
-        console.log('current time hour: '+time);
-        if(time==1) {
-          $("#inlineRadio1").removeAttr("checked");
-          $("#inlineRadio2").attr("checked","checked");
-        } else {
-          $("#inlineRadio2").removeAttr("checked");
-          $("#inlineRadio1").attr("checked","checked");
-        }
+        $("#collapseExample").on('show.bs.collapse', () => {
+          dt = new Date();
+          month = "0" + (dt.getMonth()+1);
+          date = "0" + dt.getDate();
+          dateString = dt.getFullYear() + "-" + month.substring(month.length - 2, month.length) + "-" + date.substring(date.length - 2, date.length);
+          document.getElementById("DatePicker").value = dateString;
+          time = (dt.getHours()<12) ? 0 : 1;
+          if(time == 1) {
+            $("#RadioButton2").attr("checked", "checked");
+          } else {
+            $("#RadioButton1").prop("checked", true);
+          }
+        });
       }
       function toggle2() {
         $("#collapseExample").collapse('hide');
@@ -289,36 +293,40 @@
           alert("Need to login.");
           window.location = "/index.html"; 
         }
-        $("ul").empty();
-        priceHistoryHolder = [];
+        $("ul").fadeOut(300, () => {
+          $("ul").empty();
+
+          priceHistoryHolder = [];
         
-        let collectionRef = db.collection("users").doc(uid).collection("priceLogs");
-        collectionRef.get().then(function(querySnapshot) {
-          querySnapshot.forEach(function(doc) {
-            // doc.data() is never undefined for query doc snapshots
-            console.log(doc.id, " => ", doc.data());
-            priceHistoryHolder.push(doc.data());
-          });
+          let collectionRef = db.collection("users").doc(uid).collection("priceLogs");
+          collectionRef.get().then(function(querySnapshot) {
+            querySnapshot.forEach(function(doc) {
+              // doc.data() is never undefined for query doc snapshots
+              console.log(doc.id, " => ", doc.data());
+              priceHistoryHolder.push(doc.data());
+            });
 
-          priceHistoryHolder.sort((a, b) => {
-            return -(timeStringParser(a.priceTimeStamp) - timeStringParser(b.priceTimeStamp));
-          });
+            priceHistoryHolder.sort((a, b) => {
+              return -(timeStringParser(a.priceTimeStamp) - timeStringParser(b.priceTimeStamp));
+            });
 
-          priceHistoryHolder.forEach(function(data) {
-            var tempDateStamp = data.priceTimeStamp;
-            let tempTimeIndicator = tempDateStamp[tempDateStamp.length-1];
-            let tempTime = (tempTimeIndicator=='1' ? "PM" : "AM");
-            if(tempTimeIndicator != '2') {
-              $(priceHistoryList).append('<li class="list-group-item d-flex justify-content-between align-items-center">' + tempDateStamp.substring(0,10) + ' ' + tempTime + '<span class="badge badge-primary badge-pill">$ ' + data.price + '</span>' + '</li>');
-            } else {
-              $(priceHistoryList).append('<li class="list-group-item d-flex justify-content-between align-items-center">' + tempDateStamp.substring(0,10) + ' ' + tempTime + '<span class="badge badge-danger badge-pill">$ ' + data.price + '</span>' + '</li>');
+            priceHistoryHolder.forEach(function(data) {
+              var tempDateStamp = data.priceTimeStamp;
+              let tempTimeIndicator = tempDateStamp[tempDateStamp.length-1];
+              let tempTime = (tempTimeIndicator=='1' ? "PM" : "AM");
+              if(tempTimeIndicator != '2') {
+                $(priceHistoryList).append('<li class="list-group-item d-flex justify-content-between align-items-center">' + tempDateStamp.substring(0,10) + ' ' + tempTime + '<span class="badge badge-primary badge-pill">$ ' + data.price + '</span>' + '</li>');
+              } else {
+                $(priceHistoryList).append('<li class="list-group-item d-flex justify-content-between align-items-center">' + tempDateStamp.substring(0,10) + ' ' + tempTime + '<span class="badge badge-danger badge-pill">$ ' + data.price + '</span>' + '</li>');
+              }
+            })
+          }).then(() => {
+            $("ul").fadeIn();
+            if (typeof callback == "function") {
+              callback();
             }
-          })
-        }).then(() => {
-          if (typeof callback == "function") {
-            callback();
-          }
-        });
+          });
+        })
       }
 
       function flip() {
@@ -341,24 +349,6 @@
 
           $("ul").fadeIn();
         });
-
-        // $("#priceHistoryBox").collapse('hide');
-        
-        // $("#priceHistoryBox").on('hidden.bs.collapse', () => {
-        //   $("ul").empty();
-        //   tempPriceHistoryHolder.forEach((data) => {
-        //     var tempDateStamp = data.priceTimeStamp;
-        //     let tempTimeIndicator = tempDateStamp[tempDateStamp.length-1];
-        //     let tempTime = (tempTimeIndicator=='1' ? "PM" : "AM");
-        //     if(tempTimeIndicator != '2') {
-        //       $(priceHistoryList).append('<li class="list-group-item d-flex justify-content-between align-items-center">' + tempDateStamp.substring(0,10) + ' ' + tempTime + '<span class="badge badge-primary badge-pill">$ ' + data.price + '</span>' + '</li>');
-        //     } else {
-        //       $(priceHistoryList).append('<li class="list-group-item d-flex justify-content-between align-items-center">' + tempDateStamp.substring(0,10) + ' ' + tempTime + '<span class="badge badge-danger badge-pill">$ ' + data.price + '</span>' + '</li>');
-        //     }
-        //   })
-        //   $("#priceHistoryBox").collapse('show');
-        // });
-        
       }
 
       function forecastCore() {
@@ -380,7 +370,6 @@
 
       function forecast() {
         if(priceHistoryHolder.length == 0) {
-          console.log("holder size is 0");
           fetchData(forecastCore);
         } else {
           forecastCore();
