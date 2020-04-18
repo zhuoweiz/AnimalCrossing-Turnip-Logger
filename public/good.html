@@ -189,7 +189,7 @@
         dateString = $("#DatePicker").val();
         var selectedDate = new Date(dateString);
         console.log('selected day: ' + selectedDate.getDay());
-        if(selectedDate.getDay() == 6) {
+        if(selectedDate.getDay() == 0) {
           time = 2;
           $("#buySellTag").html("Buy");
           $("#buySellTag").removeClass("badge-success");
